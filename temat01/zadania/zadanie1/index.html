@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+   <meta charset='UTF-8'>
+   <meta name='viewport'content='width=device-width, initial-scale=1.0'>
+   <!-- Add stylesheet -->
+   <link rel='stylesheet' href='style.css'>
+   <title>Calculator</title>
+   <script>
+
+   let storedValue = null;
+   let storedOperator = null;
+
+   function gen() {
+      const main = document.getElementById('main')
+      const buttons = generate_button();
+      const table = document.createElement('table');
+      main.appendChild(table);
+      const displayRow = document.createElement('tr');
+      const displayCell = document.createElement('td');
+      displayCell.setAttribute('colspan', '4');
+      const display = document.createElement('div');
+      display.dataset.value = 0;
+      display.setAttribute('id', 'display');
+      displayCell.appendChild(display);
+      displayRow.appendChild(displayCell);
+      table.appendChild(displayRow);
+      for(let rowIndex = 0; rowIndex < 5; rowIndex++) {
+         const row = document.createElement('tr');
+         for(let colIndex = 0; colIndex < 4; colIndex++) {
+            const index = rowIndex * 4 + colIndex - 2;
+            const cell = document.createElement('td');
+            if (index >= 0) {
+               const button = buttons[index];
+               cell.append(button);
+            }
+            row.append(cell);
+         }
+         table.appendChild(row);
+      }
+      refresh_display();
+   }
+
+   function generate_button() {
+      const buttons = []
+      const keyClear = document.createElement('button')
+      keyClear.innerHTML = 'C'
+      keyClear.onclick = press_clear
+      keyClear.dataset.value = 0
+      buttons.push(keyClear)
+      const keyBack = document.createElement('button')
+      keyBack.innerHTML = '<'
+      keyBack.onclick = press_back
+      keyBack.dataset.value = 0
+      buttons.push(keyBack)
+      for (let row = 2; row >= 0; row--) {
+         for (let col = 0; col <= 2; col++) {
+            const num = row * 3 + col + 1;
+            const keyNum = document.createElement('button')
+            keyNum.innerHTML = num
+            keyNum.onclick = press_number
+            keyNum.dataset.value = num
+            buttons.push(keyNum)
+         }
+      }
+      const key0 = document.createElement('button')
+      key0.innerHTML = 0
+      key0.onclick = press_number
+      key0.dataset.value = 0
+      buttons.push(key0)
+      const keyDiv = document.createElement('button')
+      keyDiv.innerHTML = '/'
+      keyDiv.dataset.value = '/'
+      keyDiv.onclick = press_operator
+      buttons.splice(5, 0, keyDiv)
+      const keyMul = document.createElement('button')
+      keyMul.innerHTML = '*'
+      keyMul.dataset.value = '*'
+      keyMul.onclick = press_operator
+      buttons.splice(9, 0, keyMul)
+      const keyMinus = document.createElement('button')
+      keyMinus.innerHTML = '-'
+      keyMinus.dataset.value = '-'
+      keyMinus.onclick = press_operator
+      buttons.splice(13, 0, keyMinus)
+      const keyDot = document.createElement('button')
+      keyDot.innerHTML = '.'
+      keyDot.onclick = press_dot
+      buttons.splice(14, 0, keyDot)
+      const keyEq = document.createElement('button')
+      keyEq.innerHTML = '='
+      keyEq.onclick = press_eq
+      buttons.splice(16, 0, keyEq)
+      const keyPlus = document.createElement('button')
+      keyPlus.innerHTML = '+'
+      keyPlus.dataset.value = '+'
+      keyPlus.onclick = press_operator
+      buttons.push(keyPlus)
+      return buttons
+   }
+
+   function press_number() {
+      const display = document.getElementById('display');
+      if (display.dataset.value == '0') {
+         display.dataset.value = this.dataset.value;
+      } else {
+         display.dataset.value += this.dataset.value;
+      }
+      refresh_display();
+   }
+   function press_clear() {
+      display.dataset.value = 0;
+      refresh_display();
+   }
+   function press_back() {
+      const display = document.getElementById('display');
+      display.dataset.value = display.dataset.value.slice(0, -1);
+      if (display.dataset.value == '') {
+         display.dataset.value = 0;
+      }
+      refresh_display();
+   }
+   function press_operator() {
+      if (storedValue !== null) {
+         press_eq();
+      }
+      const display = document.getElementById('display');
+      storedValue = parseFloat(display.dataset.value);
+      storedOperator = this.dataset.value;
+      press_clear();
+      refresh_display();
+   }
+   function press_add() {
+      if (storedValue !== null) {
+         press_eq();
+      }
+      storedValue = parseFloat(display.dataset.value);
+      storedOperator = '+';
+      press_clear();
+      refresh_display();
+   }
+   function press_sub() {
+      if (storedValue !== null) {
+         press_eq();
+      }
+      refresh_display();
+   }
+   function press_mul() {
+      if (storedValue !== null) {
+         press_eq();
+      }
+      refresh_display();
+   }
+   function press_div() {
+      if (storedValue !== null) {
+         press_eq();
+      }
+      refresh_display();
+   }
+   function press_eq() {
+      if (storedValue === null || storedOperator === null) {
+         return;
+      }
+      const display = document.getElementById('display');
+      const currentValue = parseFloat(display.dataset.value);
+      let result = 0;
+      switch (storedOperator) {
+         case '+':
+            result = storedValue + currentValue;
+            break;
+         case '-':
+            result = storedValue - currentValue;
+            break;
+         case '*':
+            result = storedValue * currentValue;
+            break;
+         case '/':
+            result = storedValue / currentValue;
+            break;
+      }
+      display.dataset.value = result;
+      storedValue = null;
+      storedOperator = null;
+      refresh_display();
+   }
+   function press_dot() {
+      const display = document.getElementById('display');
+      if (display.dataset.value.indexOf('.') == -1) {
+         display.dataset.value += '.';
+      }
+      refresh_display();
+   }
+
+   function get_display_value() {
+      const display = document.getElementById('display');
+      return parseFloat(display.dataset.value);
+   }
+
+   function refresh_display() {
+      const display = document.getElementById('display');
+      display.innerHTML = display.dataset.value;
+   }
+   </script>
+</head>
+<body onload='gen()'>
+<div id='main'>
+   <h1>Calculator</h1>
+
+</div>
+</body>
+</html>
