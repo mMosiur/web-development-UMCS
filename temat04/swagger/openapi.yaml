@@ -1,0 +1,127 @@
+openapi: 3.0.3
+info:
+  title: DEFINIOWANIE SCHEMATÓW DANNYCH W SWAGGER
+  version: 0.0.0
+paths:
+  /:
+    get:
+      responses:
+        '200':
+          description: ok
+components:
+  schemas:
+    Sesja:
+      required:
+        - Id
+        - Token
+        - Waznosc
+      properties:
+        Id:
+          type: integer
+          example: 123123
+        Token:
+          type: string
+          example: 123asa-123asa-213-asd
+        Waznosc:
+          type: integer
+          example: 123651287376512
+          description: unix timestamp
+    Uzytkownik:
+      required:
+        - Id
+        - Login
+        - Haslo
+        - Email
+      properties:
+        Id:
+          type: integer
+          example: 123123
+        Imie:
+          type: string
+          example: Mateusz
+        Nazwisko:
+          type: string
+          example: Moruś
+        Login:
+          type: string
+          example: matmor
+        Haslo:
+          type: string
+          example: k13v4kj32g4uyt4f151234k
+        Email:
+          type: string
+          example: mateusz.morus@live.umcs.edu.pl
+    Administrator:
+      allOf:
+        - $ref: '#/components/schemas/Uzytkownik'
+        - type: object
+          properties:
+            Prawa:
+              type: array
+              items:
+                type: string
+              example: ['Modyfikacja użytkowników', 'Moderacja']
+    Galeria:
+      properties:
+        Id:
+          type: integer
+          example: 123123123
+        Tytul:
+          type: string
+          example: 'Tytuł galerii'
+        Opis:
+          type: string
+          example: 'Opis galerii'
+        Data:
+          type: string
+          example: '12-01-2022'
+        Widocznosc:
+          type: boolean
+          example: true
+    Obraz:
+      properties:
+        Id:
+          type: integer
+          example: 123123123
+        Tytul:
+          type: string
+          example: 'Tytuł obrazu'
+        Opis:
+          type: string
+          example: 'Opis obrazu'
+        Data:
+          type: string
+          example: '12-01-2022'
+        NazwaPliku:
+          type: string
+          example: 'obraz.png'
+        Sciezka:
+          type: string
+          example: '/obrazy'
+        Rozmiar:
+          type: integer
+          example: 400123
+          description: 'Rozmiar w bajtach'
+    Tag:
+      properties:
+        Id:
+          type: integer
+          example: 123123
+        Tekst:
+          type: string
+          example: 'Impresjonizm'
+    Miniatura:
+      properties:
+        Typ:
+          type: string
+    Komentarz:
+      properties:
+        Id:
+          type: integer
+          example: 123123
+        Tresc:
+          type: string
+          example: 'Bardzo ładny obraz!'
+        Data:
+          type: string
+          example: '12-01-2022'
