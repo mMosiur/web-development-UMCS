@@ -1,4 +1,5 @@
 using MongoDB.Bson.Serialization.Attributes;
+using PicturePortal.Models.Base;
 
 namespace PicturePortal.Models;
 

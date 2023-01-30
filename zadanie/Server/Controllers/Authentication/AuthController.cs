@@ -6,11 +6,12 @@ using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using PicturePortal.Contracts.Requests;
 using PicturePortal.Contracts.Responses;
 using PicturePortal.Models;
 using PicturePortal.Services;
 using PicturePortal.Helpers;
+using PicturePortal.Contracts.Responses.Auth;
+using PicturePortal.Contracts.Requests.Auth;
 
 namespace PicturePortal.Controllers.Authentication;
 

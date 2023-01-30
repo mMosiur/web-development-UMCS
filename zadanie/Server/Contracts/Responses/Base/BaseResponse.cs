@@ -1,4 +1,4 @@
-namespace PicturePortal.Contracts.Responses;
+namespace PicturePortal.Contracts.Responses.Base;
 
 public abstract class BaseResponse
 {

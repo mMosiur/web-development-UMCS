@@ -23,10 +23,7 @@ public class AuthService
         return Convert.ToBase64String(hash);
     }
 
-    public async Task<Result<User>> VerifyLoginInfo(string username, string password)
-        => await VerifyLoginInfo(username, password, CancellationToken.None);
-
-    private async Task<Result<User>> VerifyLoginInfo(string username, string password, CancellationToken cancellationToken)
+    public async Task<Result<User>> VerifyLoginInfo(string username, string password, CancellationToken cancellationToken = default)
     {
         User? user = await _usersCollection
             .Find(u => u.Username == username)
@@ -43,10 +40,7 @@ public class AuthService
         return Result.Ok(user);
     }
 
-    public async Task<Result<User>> CreateUser(string username, string password)
-        => await CreateUser(username, password, CancellationToken.None);
-
-    public async Task<Result<User>> CreateUser(string username, string password, CancellationToken cancellationToken)
+    public async Task<Result<User>> CreateUser(string username, string password, CancellationToken cancellationToken = default)
     {
         bool exists = await _usersCollection
             .Find(u => u.Username == username)

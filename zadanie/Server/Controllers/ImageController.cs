@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Mime;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
-using MongoDB.Bson.IO;
 using MongoDB.Driver;
+using PicturePortal.Contracts.DTOs;
+using PicturePortal.Contracts.Requests.Images;
 using PicturePortal.Data;
 using PicturePortal.Models;
 
@@ -18,24 +15,26 @@ namespace PicturePortal.Controllers;
 [Route("api/[controller]")]
 public class ImageController : ControllerBase
 {
-    private readonly IMongoCollection<Image> _imageCollection;
+    private readonly DatabaseContext _dbContext;
 
     public ImageController(DatabaseContext dbContext)
     {
-        _imageCollection = dbContext.Images;
+        _dbContext = dbContext;
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<string>> GetAsync(string id)
+    [ProducesResponseType(typeof(FileContentResult), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<IActionResult> GetImage(string id, CancellationToken cancellationToken)
     {
-        Image? image = await _imageCollection
+        Image? image = await _dbContext.Images
             .Find(i => i.Id == id)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
         if (image is null)
         {
             return NotFound();
         }
-        System.Net.Mime.ContentDisposition disposition = new()
+        ContentDisposition disposition = new()
         {
             FileName = $"image.{image.Extension}",
             Inline = false
@@ -44,24 +43,64 @@ public class ImageController : ControllerBase
         return File(image.Bytes, $"image/{image.Extension}");
     }
 
-    [HttpPost]
-    public async Task<ActionResult<string>> PostAsync(IFormFile file, CancellationToken cancellationToken)
+    [HttpGet("{id}/info")]
+    [ProducesResponseType(typeof(ImageInfoDto), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<IActionResult> GetImageInfo(string id, CancellationToken cancellationToken)
     {
-        string extension = Path.GetExtension(file.FileName).Substring(1);
-        if(extension != "jpg" && extension != "jpeg" && extension != "png")
+        Image? image = await _dbContext.Images
+            .Find(i => i.Id == id)
+            .FirstOrDefaultAsync(cancellationToken);
+        if (image is null)
+        {
+            return NotFound();
+        }
+        User user = await _dbContext.Users.Find(u => u.Id == image.AuthorId).FirstAsync(cancellationToken);
+        UserDto author = new()
+        {
+            Id = image.AuthorId,
+            DisplayName = user.Name
+        };
+        ImageInfoDto dto = new()
+        {
+            Id = image.Id,
+            Title = image.Title,
+            Author = author,
+            Comments = image.Comments.Select(c => new CommentDto() { AuthorName = c.AuthorName, Content = c.Content })
+        };
+        return Ok(dto);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.Created)]
+    [ProducesResponseType(typeof(void), (int)HttpStatusCode.Unauthorized)]
+    [ProducesResponseType(typeof(void), (int)HttpStatusCode.UnsupportedMediaType)]
+    [Authorize]
+    public async Task<IActionResult> Post([FromForm] CreateImageRequest request, CancellationToken cancellationToken)
+    {
+        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+        string extension = Path.GetExtension(request.File.FileName)[1..];
+        if (extension != "jpg" && extension != "jpeg" && extension != "png")
         {
             return new UnsupportedMediaTypeResult();
         }
-        using Stream sourceStream = file.OpenReadStream();
+        using Stream sourceStream = request.File.OpenReadStream();
         using MemoryStream memoryStream = new();
         await sourceStream.CopyToAsync(memoryStream, cancellationToken);
         Image image = new()
         {
+            AuthorId = userId,
             Bytes = memoryStream.ToArray(),
-            Extension = extension
+            Extension = extension,
+            DatePublished = DateTime.Now,
+            Title = request.Title
         };
         InsertOneOptions options = new();
-        await _imageCollection.InsertOneAsync(image, options, cancellationToken);
-        return Ok(image.Id);
+        await _dbContext.Images.InsertOneAsync(image, options, cancellationToken);
+        return CreatedAtAction(
+            actionName: nameof(GetImage),
+            routeValues: new { id = image.Id },
+            value: new { ImageId = image.Id }
+        );
     }
 }

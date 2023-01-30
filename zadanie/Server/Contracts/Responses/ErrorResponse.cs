@@ -1,3 +1,5 @@
+using PicturePortal.Contracts.Responses.Base;
+
 namespace PicturePortal.Contracts.Responses;
 
 public class ErrorResponse : BaseResponse
