@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using PicturePortal.Models;
@@ -20,5 +16,9 @@ public class DatabaseContext
         _database = client.GetDatabase(_options.DatabaseName);
     }
 
-    public IMongoCollection<User> Users => _database.GetCollection<User>(_options.UsersCollectionName);
+    public IMongoCollection<User> Users =>
+        _database.GetCollection<User>(_options.UsersCollectionName);
+
+    public IMongoCollection<Image> Images =>
+        _database.GetCollection<Image>(_options.ImagesCollectionName);
 }

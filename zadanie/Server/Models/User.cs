@@ -1,16 +1,16 @@
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace PicturePortal.Models;
 
-public class User
+public class User : Entity
 {
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; set; } = string.Empty;
-
     [BsonRequired]
     public required string Username { get; set; }
+
+    public string? DisplayName { get; set; }
+
+    [BsonIgnore]
+    public string Name => DisplayName ?? Username;
 
     [BsonRequired]
     public required string PasswordHash { get; set; }

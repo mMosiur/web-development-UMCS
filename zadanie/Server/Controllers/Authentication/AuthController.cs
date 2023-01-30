@@ -19,14 +19,12 @@ namespace PicturePortal.Controllers.Authentication;
 [AllowAnonymous]
 public class AuthController : ControllerBase
 {
-    private readonly ILogger<AuthController> _logger;
     private readonly IConfiguration _config;
     private readonly AuthService _authService;
 
-    public AuthController(ILogger<AuthController> logger, IConfiguration config, AuthService authService)
+    public AuthController(IConfiguration config, AuthService authService)
     {
         _authService = authService;
-        _logger = logger;
         _config = config;
     }
 

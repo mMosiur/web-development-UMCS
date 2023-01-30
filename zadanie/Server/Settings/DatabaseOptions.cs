@@ -7,4 +7,5 @@ public class DatabaseOptions
     public required string ConnectionString { get; init; }
     public required string DatabaseName { get; init; }
     public required string UsersCollectionName { get; init; }
+    public required string ImagesCollectionName { get; init; }
 }
