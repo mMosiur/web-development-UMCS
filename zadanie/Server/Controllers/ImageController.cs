@@ -3,6 +3,7 @@ using System.Net.Mime;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using PicturePortal.Contracts.DTOs;
 using PicturePortal.Contracts.Requests.Images;
@@ -27,6 +28,10 @@ public class ImageController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public async Task<IActionResult> GetImage(string id, CancellationToken cancellationToken)
     {
+        if (!ObjectId.TryParse(id, out _))
+        {
+            return NotFound();
+        }
         Image? image = await _dbContext.Images
             .Find(i => i.Id == id)
             .FirstOrDefaultAsync(cancellationToken);
@@ -48,6 +53,10 @@ public class ImageController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     public async Task<IActionResult> GetImageInfo(string id, CancellationToken cancellationToken)
     {
+        if (!ObjectId.TryParse(id, out _))
+        {
+            return NotFound();
+        }
         Image? image = await _dbContext.Images
             .Find(i => i.Id == id)
             .FirstOrDefaultAsync(cancellationToken);
