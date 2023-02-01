@@ -1,0 +1,27 @@
+<form (ngSubmit)="onSubmit()" #addImageForm="ngForm">
+  <div class="form-group">
+    <div>
+      <label for="title-input">Title:</label>
+      <input type="text" class="form-control" name="title" id="title-input"
+        required #imageTitle [(ngModel)]="request.title"/>
+    </div>
+    <div>
+      <label for="file-input">Select image to upload:</label>
+      <input type="file" class="form-control" id="file-input"
+        (change)="handleFileInput($event.target)"/>
+    </div>
+    <div>
+      <label for="description-input">Description:</label>
+      <textarea class="form-control" name="description" id="description-input"
+        class="form-control" required #imageDescription [(ngModel)]="request.description"></textarea>
+    </div>
+    <div>
+      <label for="tags-input">Tags (separate with spaces):</label>
+      <input type="text" class="form-control" name="spaceSeparatedTags" id="tags-input"
+        class="form-control" required #imageTags [(ngModel)]="request.spaceSeparatedTags"/>
+    </div>
+    <div>
+      <input type="submit" value="Upload"/>
+    </div>
+  </div>
+</form>

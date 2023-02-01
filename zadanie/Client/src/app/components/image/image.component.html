@@ -1,0 +1,49 @@
+<div *ngIf="!loading; else imageLoading">
+  <div *ngIf="imageInfo; else imageNotFound">
+    <div class="card text-center">
+      <div class="card-header">
+        Image by: {{imageInfo.author.displayName}}
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">{{imageInfo.title}}</h5>
+        <img src="{{imageUrl}}" alt="{{ imageInfo.title }}"/>
+        <p class="card-text" *ngIf="imageInfo.description">{{imageInfo.description}}</p>
+      </div>
+      <div class="card-footer text-muted">
+        Tags: <span *ngIf="!imageInfo.tags.length">None</span>
+        <span *ngIf="imageInfo.tags.length">
+          <span *ngFor="let tag of imageInfo.tags" class="badge bg-primary m-1">{{tag}}</span>
+        </span>
+      </div>
+      <div class="mx-auto">
+        <div class="card" class="m-2" style="width: 68rem;">
+          <div class="card-header">
+            Comments
+          </div>
+          <div *ngIf="!imageInfo.comments.length"><i>Empty</i></div>
+          <ul class="list-group list-group-flush" *ngIf="imageInfo.comments.length">
+            <li class="list-group-item" *ngFor="let comment of imageInfo.comments">{{ comment }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #imageLoading>
+  <div class="d-flex justify-content-center">
+    <div class="spinner-grow" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #imageNotFound>
+  <div class="d-flex justify-content-center">
+    <div class="card" style="width: 18rem;">
+      <div class="card-body">
+        <p class="card-text">Image not found.</p>
+      </div>
+    </div>
+  </div>
+</ng-template>
