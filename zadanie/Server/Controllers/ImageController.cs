@@ -64,11 +64,11 @@ public class ImageController : ControllerBase
         {
             return NotFound();
         }
-        User user = await _dbContext.Users.Find(u => u.Id == image.AuthorId).FirstAsync(cancellationToken);
+        User? user = await _dbContext.Users.Find(u => u.Id == image.AuthorId).FirstOrDefaultAsync(cancellationToken);
         UserDto author = new()
         {
             Id = image.AuthorId,
-            DisplayName = user.Name
+            DisplayName = user?.Name ?? "Unknown"
         };
         ImageInfoDto dto = new()
         {
