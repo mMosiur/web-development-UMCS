@@ -1,1 +1,10 @@
-<p>image-list works!</p>
+<div class="list-group m-5" *ngIf="images.length">
+  <a href="image/{{image.id}}" class="list-group-item list-group-item-action" *ngFor="let image of images">
+    <h3>"{{image.title}}" <span *ngIf="image.author.displayName"> by {{image.author.displayName}}</span></h3>
+    <span *ngIf="image.description">{{image.description}}</span>
+  </a>
+</div>
+<div class="m-5" *ngIf="!images.length">
+  No images yet.
+</div>
+<div class="m-5"><a routerLink="/add-image">Add new image</a></div>

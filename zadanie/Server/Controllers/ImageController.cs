@@ -48,6 +48,21 @@ public class ImageController : ControllerBase
         return File(image.Bytes, $"image/{image.Extension}");
     }
 
+    [HttpGet("all")]
+    [ProducesResponseType(typeof(IEnumerable<ImageInfoDto>), (int)HttpStatusCode.OK)]
+    public IActionResult GetAllImages(CancellationToken cancellationToken)
+    {
+        IEnumerable<Image> images = _dbContext.Images
+            .Find(i => true)
+            .ToEnumerable(cancellationToken);
+        return Ok(images.Select(i => new ImageInfoDto()
+        {
+            Id = i.Id,
+            Title = i.Title,
+            Author = new UserDto() { Id = i.AuthorId, DisplayName = "" }
+        }));
+    }
+
     [HttpGet("{id}/info")]
     [ProducesResponseType(typeof(ImageInfoDto), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
