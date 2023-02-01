@@ -87,7 +87,7 @@ public class ImageController : ControllerBase
     // [Authorize] // No authorization for the time being
     public async Task<IActionResult> CreateImage([FromForm] CreateImageRequest request, CancellationToken cancellationToken)
     {
-        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? ObjectId.Empty.ToString();
         string extension = Path.GetExtension(request.File.FileName)[1..];
         if (extension != "jpg" && extension != "jpeg" && extension != "png")
         {
