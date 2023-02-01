@@ -84,8 +84,8 @@ public class ImageController : ControllerBase
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.Created)]
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.UnsupportedMediaType)]
-    [Authorize]
-    public async Task<IActionResult> Post([FromForm] CreateImageRequest request, CancellationToken cancellationToken)
+    // [Authorize] // No authorization for the time being
+    public async Task<IActionResult> CreateImage([FromForm] CreateImageRequest request, CancellationToken cancellationToken)
     {
         string userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
         string extension = Path.GetExtension(request.File.FileName)[1..];
@@ -96,13 +96,17 @@ public class ImageController : ControllerBase
         using Stream sourceStream = request.File.OpenReadStream();
         using MemoryStream memoryStream = new();
         await sourceStream.CopyToAsync(memoryStream, cancellationToken);
+        string[]? tags = request.SpaceSeparatedTags?.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            ?? Array.Empty<string>();
         Image image = new()
         {
             AuthorId = userId,
             Bytes = memoryStream.ToArray(),
             Extension = extension,
             DatePublished = DateTime.Now,
-            Title = request.Title
+            Title = request.Title,
+            Description = request.Description,
+            Tags = tags
         };
         InsertOneOptions options = new();
         await _dbContext.Images.InsertOneAsync(image, options, cancellationToken);
