@@ -1,11 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 interface AddImageRequest {
   title: string;
   description: string;
   file: File | null;
   spaceSeparatedTags: string;
+}
+
+interface AddImageResponse {
+  imageId: string;
 }
 
 @Component({
@@ -15,7 +20,7 @@ interface AddImageRequest {
 })
 export class AddImageComponent {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router) { }
 
   request: AddImageRequest = {
     title: "",
@@ -37,7 +42,8 @@ export class AddImageComponent {
     this.http.post("http://localhost:5017/api/image", formData)
       .subscribe({
         next: (data) => {
-          console.log(data);
+          const id = (data as AddImageResponse).imageId;
+          this.router.navigate(["/image/" + id]);
         },
         error: (error) => {
           console.warn(error);
