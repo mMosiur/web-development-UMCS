@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using PicturePortal.Contracts.DTOs;
+using PicturePortal.Contracts.Requests.Comments;
 using PicturePortal.Contracts.Requests.Images;
 using PicturePortal.Data;
 using PicturePortal.Models;
@@ -134,5 +135,29 @@ public class ImageController : ControllerBase
             routeValues: new { id = image.Id },
             value: new { ImageId = image.Id }
         );
+    }
+
+    [HttpPost("{id}/add-comment")]
+    [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
+    [ProducesResponseType(typeof(void), (int)HttpStatusCode.Unauthorized)]
+    // [Authorize] // No authorization for the time being
+    public async Task<IActionResult> AddComment([FromRoute] string id, [FromBody] AddCommentRequest request, CancellationToken cancellationToken)
+    {
+        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? ObjectId.Empty.ToString();
+        Image? image = await _dbContext.Images.Find(i => i.Id == id).FirstOrDefaultAsync(cancellationToken);
+        if (image is null)
+        {
+            return NotFound();
+        }
+        image.Comments.Add(new Comment()
+        {
+            AuthorName = "",
+            Content = request.Comment,
+            DateAdded = DateTime.Now
+        });
+        ReplaceOptions options = new() { IsUpsert = true };
+        await _dbContext.Images.ReplaceOneAsync(i => i.Id == id, image, options, cancellationToken);
+        return Ok();
     }
 }

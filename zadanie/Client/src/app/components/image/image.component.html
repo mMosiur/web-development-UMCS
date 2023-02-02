@@ -6,7 +6,7 @@
       </div>
       <div class="card-body">
         <h5 class="card-title">{{imageInfo.title}}</h5>
-        <img src="{{imageUrl}}" alt="{{ imageInfo.title }}"/>
+        <img src="{{imageUrl}}" alt="{{ imageInfo.title }}" />
         <p class="card-text" *ngIf="imageInfo.description">{{imageInfo.description}}</p>
       </div>
       <div class="card-footer text-muted">
@@ -15,16 +15,15 @@
           <span *ngFor="let tag of imageInfo.tags" class="badge bg-primary m-1">{{tag}}</span>
         </span>
       </div>
-      <div class="mx-auto">
-        <div class="card" class="m-2" style="width: 68rem;">
-          <div class="card-header">
-            Comments
-          </div>
-          <div *ngIf="!imageInfo.comments.length"><i>Empty</i></div>
-          <ul class="list-group list-group-flush" *ngIf="imageInfo.comments.length">
-            <li class="list-group-item" *ngFor="let comment of imageInfo.comments">{{ comment }}</li>
-          </ul>
+      <div class="card" class="m-2">
+        <div class="card-header">
+          Comments
         </div>
+        <div *ngIf="!imageInfo.comments.length"><i>Empty</i></div>
+        <ul class="list-group list-group-flush" *ngIf="imageInfo.comments.length">
+          <li class="list-group-item" *ngFor="let comment of imageInfo.comments">{{ comment }}</li>
+        </ul>
+        <div> Add comment </div>
       </div>
     </div>
   </div>
