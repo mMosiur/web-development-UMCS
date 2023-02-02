@@ -21,9 +21,19 @@
         </div>
         <div *ngIf="!imageInfo.comments.length"><i>Empty</i></div>
         <ul class="list-group list-group-flush" *ngIf="imageInfo.comments.length">
-          <li class="list-group-item" *ngFor="let comment of imageInfo.comments">{{ comment }}</li>
+          <li class="list-group-item" *ngFor="let comment of imageInfo.comments">
+            <span class="badge bg-light text-dark" *ngIf="comment.authorName">{{comment.authorName}}</span>
+            <span>{{ comment.content }}</span>
+          </li>
         </ul>
-        <div> Add comment </div>
+      </div>
+    </div>
+    <div class="card mx-auto  my-2" style="width: 18rem;">
+      <div class="card-body ">
+        <h5 class="card-title">Add comment</h5>
+        <textarea class="card-text w-100 h-100" [(ngModel)]="comment"></textarea>
+        <hr>
+        <button class="btn btn-primary card-link" [disabled]="!cleanedComment" (click)="onAddComment()">Add</button>
       </div>
     </div>
   </div>

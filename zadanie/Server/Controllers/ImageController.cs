@@ -138,7 +138,7 @@ public class ImageController : ControllerBase
     }
 
     [HttpPost("{id}/add-comment")]
-    [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(CommentDto), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.Unauthorized)]
     // [Authorize] // No authorization for the time being
@@ -152,12 +152,17 @@ public class ImageController : ControllerBase
         }
         image.Comments.Add(new Comment()
         {
-            AuthorName = "",
+            AuthorName = userId,
             Content = request.Comment,
             DateAdded = DateTime.Now
         });
         ReplaceOptions options = new() { IsUpsert = true };
         await _dbContext.Images.ReplaceOneAsync(i => i.Id == id, image, options, cancellationToken);
-        return Ok();
+        CommentDto dto = new()
+        {
+            AuthorName = userId,
+            Content = request.Comment
+        };
+        return Ok(dto);
     }
 }

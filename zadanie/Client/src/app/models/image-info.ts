@@ -1,3 +1,4 @@
+import { Comment } from "./comment";
 import { UserInfo } from "./user-info";
 
 export interface ImageInfo {
@@ -5,6 +6,6 @@ export interface ImageInfo {
   title: string;
   author: UserInfo;
   tags: string[];
-  comments: string[];
+  comments: Comment[];
   description?: string;
 }

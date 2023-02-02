@@ -1,5 +1,7 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Comment } from 'src/app/models/comment';
 import { ImageInfo } from 'src/app/models/image-info';
 import { ImagesService } from 'src/app/services/images.service';
 
@@ -15,12 +17,19 @@ export class ImageComponent {
   imageInfo?: ImageInfo;
   imageUrl?: string;
 
+  comment: string = "";
+
+  get cleanedComment() {
+    return this.comment.trim();
+  }
+
   constructor(
-    private route: ActivatedRoute,
-    imagesService: ImagesService
+    route: ActivatedRoute,
+    imagesService: ImagesService,
+    private http: HttpClient
   ) {
     this.loading = true;
-    this.id = this.route.snapshot.paramMap.get('id') || '';
+    this.id = route.snapshot.paramMap.get('id') || '';
     imagesService.getImageInfo(this.id)
       .subscribe(
         {
@@ -34,5 +43,19 @@ export class ImageComponent {
             this.loading = false;
           }
         });
+  }
+
+  onAddComment() {
+    this.http.post<Comment>("http://localhost:5017/api/image/" + this.id + "/add-comment", {
+      comment: this.cleanedComment
+    }).subscribe({
+      next: (value) => {
+        this.imageInfo?.comments.push(value);
+        this.comment = "";
+      },
+      error: (error) => {
+        console.warn(error);
+      }
+    });
   }
 }
