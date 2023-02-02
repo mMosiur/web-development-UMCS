@@ -90,6 +90,7 @@ public class ImageController : ControllerBase
             Id = image.Id,
             Title = image.Title,
             Author = author,
+            Tags = image.Tags,
             Comments = image.Comments.Select(c => new CommentDto() { AuthorName = c.AuthorName, Content = c.Content })
         };
         return Ok(dto);
@@ -111,8 +112,11 @@ public class ImageController : ControllerBase
         using Stream sourceStream = request.File.OpenReadStream();
         using MemoryStream memoryStream = new();
         await sourceStream.CopyToAsync(memoryStream, cancellationToken);
-        string[]? tags = request.SpaceSeparatedTags?.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-            ?? Array.Empty<string>();
+        ICollection<string> tags = request.SpaceSeparatedTags is not null
+            ? request.SpaceSeparatedTags
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .Select(t => t.ToLowerInvariant()).ToList()
+            : Array.Empty<string>();
         Image image = new()
         {
             AuthorId = userId,
