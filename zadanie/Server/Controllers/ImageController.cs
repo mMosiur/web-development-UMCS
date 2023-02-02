@@ -101,7 +101,7 @@ public class ImageController : ControllerBase
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.Created)]
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.UnsupportedMediaType)]
-    // [Authorize] // No authorization for the time being
+    [Authorize]
     public async Task<IActionResult> CreateImage([FromForm] CreateImageRequest request, CancellationToken cancellationToken)
     {
         string userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? ObjectId.Empty.ToString();
@@ -141,10 +141,11 @@ public class ImageController : ControllerBase
     [ProducesResponseType(typeof(CommentDto), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
     [ProducesResponseType(typeof(void), (int)HttpStatusCode.Unauthorized)]
-    // [Authorize] // No authorization for the time being
+    [Authorize]
     public async Task<IActionResult> AddComment([FromRoute] string id, [FromBody] AddCommentRequest request, CancellationToken cancellationToken)
     {
         string userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? ObjectId.Empty.ToString();
+        User user = await _dbContext.Users.Find(u => u.Id == userId).FirstOrDefaultAsync(cancellationToken);
         Image? image = await _dbContext.Images.Find(i => i.Id == id).FirstOrDefaultAsync(cancellationToken);
         if (image is null)
         {
@@ -152,7 +153,7 @@ public class ImageController : ControllerBase
         }
         image.Comments.Add(new Comment()
         {
-            AuthorName = userId,
+            AuthorName = user.Name,
             Content = request.Comment,
             DateAdded = DateTime.Now
         });
@@ -160,7 +161,7 @@ public class ImageController : ControllerBase
         await _dbContext.Images.ReplaceOneAsync(i => i.Id == id, image, options, cancellationToken);
         CommentDto dto = new()
         {
-            AuthorName = userId,
+            AuthorName = user.Name,
             Content = request.Comment
         };
         return Ok(dto);
