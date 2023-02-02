@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  client:
+    build: Client/
+    ports:
+      - "80:80"
+  server:
+    build: Server/
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+  mongodb:
+    image: mongo:6.0.4
